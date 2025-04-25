@@ -1,0 +1,36 @@
+services:
+  tailscale:
+    image: ${TAILSCALE_IMAGE}:${TAILSCALE_TAG}
+    container_name: ${TAILSCALE_NAME}
+    hostname: ${TAILSCALE_HOSTNAME}
+    networks:
+      macvlan_network:
+        ipv4_address: ${TAILSCALE_IP}
+    volumes:
+      - ${TAILSCALE_STATE_PATH}:/var/lib/tailscale
+      - /dev/net/tun:/dev/net/tun
+      - ${TAILSCALE_SOCKET_PATH}:/var/run/tailscale
+    environment:
+      - TS_AUTHKEY=${TS_AUTHKEY}
+      - TS_STATE_DIR=/var/lib/tailscale
+      - TS_SOCKET=/var/run/tailscale/tailscaled.sock
+      - TS_EXTRA_ARGS=${TS_EXTRA_ARGS}
+      - TS_NO_IPV6=${TS_NO_IPV6}
+    cap_add:
+      - NET_ADMIN
+      - SYS_MODULE
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "tailscale", "status"]
+      interval: ${HEALTH_INTERVAL}
+      timeout: ${HEALTH_TIMEOUT}
+      retries: ${HEALTH_RETRIES}
+    logging:
+      driver: ${LOG_DRIVER}
+      options:
+        max-size: ${LOG_SIZE}
+        max-file: ${LOG_FILES}
+
+networks:
+  macvlan_network:
+    external: true

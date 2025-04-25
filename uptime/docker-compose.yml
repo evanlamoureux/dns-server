@@ -1,0 +1,34 @@
+services:
+  statusowl-dockman:
+    image: ${STATUSOWL_IMAGE}:${STATUSOWL_TAG}
+    container_name: ${STATUSOWL_NAME}
+    hostname: ${STATUSOWL_HOSTNAME}
+    restart: unless-stopped
+    pull_policy: always
+    ports:
+      - "${STATUSOWL_PORT}:9934"
+    environment:
+      NODE_UUID: ${STATUSOWL_NODE_UUID}
+      NODE_API_KEY: ${STATUSOWL_NODE_API_KEY}
+      API_BASE: ${STATUSOWL_API_BASE}
+    networks:
+      macvlan_network:
+        ipv4_address: ${STATUSOWL_IP}
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ${STATUSOWL_DATA_PATH}:/opt/statusowl/dockman/data
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://localhost:9934"]
+      interval: ${HEALTH_INTERVAL}
+      timeout: ${HEALTH_TIMEOUT}
+      start_period: ${HEALTH_START}
+      retries: ${HEALTH_RETRIES}
+    logging:
+      driver: ${LOG_DRIVER}
+      options:
+        max-size: ${LOG_SIZE}
+        max-file: ${LOG_FILES}
+
+networks:
+  macvlan_network:
+    external: true

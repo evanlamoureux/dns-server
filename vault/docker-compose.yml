@@ -1,0 +1,40 @@
+services:
+  vaultwarden:
+    image: ${VAULT_IMAGE}:${VAULT_TAG}
+    container_name: ${VAULT_NAME}
+    hostname: ${VAULT_HOSTNAME}
+    restart: unless-stopped
+    networks:
+      macvlan_network:
+        ipv4_address: ${VAULT_IP}
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:80/"]
+      interval: ${HEALTH_INTERVAL}
+      timeout: ${HEALTH_TIMEOUT}
+      retries: ${HEALTH_RETRIES}
+    volumes:
+      - ${VAULT_DATA_PATH}:/data
+    environment:
+      DOMAIN: ${VAULT_DOMAIN}
+      SIGNUPS_ALLOWED: ${VAULT_SIGNUPS_ALLOWED}
+      ADMIN_TOKEN: ${VAULT_ADMIN_TOKEN}
+      WEBSOCKET_ENABLED: ${VAULT_WEBSOCKET_ENABLED}
+      SMTP_HOST: ${SMTP_HOST}
+      SMTP_PORT: ${SMTP_PORT}
+      SMTP_SECURITY: ${SMTP_SECURITY}
+      SMTP_AUTH_MECHANISM: ${SMTP_AUTH_MECHANISM}
+      SMTP_USERNAME: ${SMTP_USERNAME}
+      SMTP_PASSWORD: ${SMTP_PASSWORD}
+      SMTP_FROM: ${SMTP_FROM}
+      ATTACHMENTS_ENABLED: ${VAULT_ATTACHMENTS_ENABLED}
+      ATTACHMENTS_FOLDER: ${VAULT_ATTACHMENTS_FOLDER}
+      ATTACHMENTS_LIMIT: ${VAULT_ATTACHMENTS_LIMIT}
+    logging:
+      driver: ${LOG_DRIVER}
+      options:
+        max-size: ${LOG_SIZE}
+        max-file: ${LOG_FILES}
+
+networks:
+  macvlan_network:
+    external: true

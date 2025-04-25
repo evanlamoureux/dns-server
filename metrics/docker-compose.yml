@@ -1,1 +1,136 @@
+services:
+  grafana:
+    image: ${GRAFANA_IMAGE}:${GRAFANA_TAG}
+    container_name: ${GRAFANA_NAME}
+    networks:
+      macvlan_network:
+        ipv4_address: ${GRAFANA_IP}
+    volumes:
+      - ${GRAFANA_PROVISIONING_PATH}:/etc/grafana/provisioning
+      - ${GRAFANA_CERT_CRT}:/etc/ssl/certs/logs.abjuration.home.crt:ro
+      - ${GRAFANA_CERT_PEM}:/etc/ssl/certs/logs.abjuration.home.pem:ro
+      - ${GRAFANA_DATA_PATH}:/var/lib/grafana
+      - ${GRAFANA_LOG_PATH}:/var/log/grafana
+      - ${GRAFANA_PLUGIN_PATH}:/var/lib/grafana/plugins
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:3000/login"]
+      interval: ${HEALTH_INTERVAL}
+      timeout: ${HEALTH_TIMEOUT}
+      retries: ${HEALTH_RETRIES}
+      start_period: ${HEALTH_START}
+    dns:
+      - ${DNS_IP}
+    logging:
+      driver: ${LOG_DRIVER}
+      options:
+        max-size: ${LOG_SIZE}
+        max-file: ${LOG_FILES}
 
+  prometheus:
+    image: ${PROMETHEUS_IMAGE}:${PROMETHEUS_TAG}
+    container_name: ${PROMETHEUS_NAME}
+    networks:
+      macvlan_network:
+        ipv4_address: ${PROMETHEUS_IP}
+    volumes:
+      - ${PROMETHEUS_CONFIG_PATH}:/etc/prometheus
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:9090/-/ready"]
+      interval: ${HEALTH_INTERVAL}
+      timeout: ${HEALTH_TIMEOUT}
+      retries: ${HEALTH_RETRIES}
+      start_period: ${HEALTH_START}
+    logging:
+      driver: ${LOG_DRIVER}
+      options:
+        max-size: ${LOG_SIZE}
+        max-file: ${LOG_FILES}
+
+  loki:
+    container_name: ${LOKI_NAME}
+    image: ${LOKI_IMAGE}:${LOKI_TAG}
+    restart: unless-stopped
+    networks:
+      macvlan_network:
+        ipv4_address: ${LOKI_IP}
+    ports:
+      - "${LOKI_PORT}:3100"
+    volumes:
+      - ${LOKI_CONFIG}:/etc/loki/local-config.yaml
+      - ${LOKI_DATA_PATH}:/loki
+      - ${LOKI_WAL_PATH}:/wal
+      - ${LOKI_COMPACTOR_PATH}:/loki/compactor
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:3100/ready"]
+      interval: ${HEALTH_INTERVAL}
+      timeout: ${HEALTH_TIMEOUT}
+      retries: ${HEALTH_RETRIES}
+    read_only: true
+    tmpfs:
+      - /tmp
+    logging:
+      driver: ${LOG_DRIVER}
+      options:
+        max-size: ${LOG_SIZE}
+        max-file: ${LOG_FILES}
+
+  promtail:
+    image: ${PROMTAIL_IMAGE}:${PROMTAIL_TAG}
+    container_name: ${PROMTAIL_NAME}
+    restart: unless-stopped
+    command: -config.file=${PROMTAIL_CONFIG_CONTAINER}
+    networks:
+      macvlan_network:
+        ipv4_address: ${PROMTAIL_IP}
+    volumes:
+      - ${HOST_LOG_PATH}:/var/log:ro
+      - ${PROMTAIL_CONFIG_HOST}:${PROMTAIL_CONFIG_CONTAINER}:ro
+      - ${PROMTAIL_DATA_PATH}:/etc/promtail:rw
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    healthcheck:
+      test: ["CMD-SHELL", "bash -c 'printf \"GET / HTTP/1.1\n\n\" > /dev/tcp/127.0.0.1/9080; exit $?;'"]
+      interval: ${PROMTAIL_HEALTH_INTERVAL}
+      retries: ${PROMTAIL_HEALTH_RETRIES}
+      timeout: ${PROMTAIL_HEALTH_TIMEOUT}
+      start_period: ${PROMTAIL_HEALTH_START}
+    logging:
+      driver: ${LOG_DRIVER}
+      options:
+        max-size: ${LOG_SIZE}
+        max-file: ${LOG_FILES}
+
+  node-exporter:
+    image: ${NODE_EXPORTER_IMAGE}:${NODE_EXPORTER_TAG}
+    container_name: ${NODE_EXPORTER_NAME}
+    restart: unless-stopped
+    networks:
+      macvlan_network:
+        ipv4_address: ${NODE_EXPORTER_IP}
+    pid: "host"
+    volumes:
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - /:/host:ro
+    command:
+      - '--web.listen-address=0.0.0.0:9100'
+      - '--path.procfs=/host/proc'
+      - '--path.sysfs=/host/sys'
+      - '--path.rootfs=/host'
+      - '--collector.filesystem.ignored-mount-points=^/(sys|proc|dev|host)($|/)'
+      - '--collector.pressure'
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:9100/metrics"]
+      interval: ${HEALTH_INTERVAL}
+      timeout: ${HEALTH_TIMEOUT}
+      retries: ${HEALTH_RETRIES}
+    logging:
+      driver: ${LOG_DRIVER}
+      options:
+        max-size: ${LOG_SIZE}
+        max-file: ${LOG_FILES}
+
+networks:
+  macvlan_network:
+    external: true

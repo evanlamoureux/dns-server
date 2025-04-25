@@ -1,0 +1,32 @@
+services:
+  caddy:
+    image: ${CADDY_IMAGE}:${CADDY_TAG}
+    container_name: ${CADDY_NAME}
+    hostname: ${CADDY_HOSTNAME}
+    restart: unless-stopped
+    ports:
+      - "${CADDY_PORT_HTTP}:80"
+      - "${CADDY_PORT_HTTPS}:443"
+    networks:
+      macvlan_network:
+        ipv4_address: ${CADDY_IP}
+    volumes:
+      - ${CADDY_CONFIG_PATH}/Caddyfile:/etc/caddy/Caddyfile
+      - ${CADDY_DATA_PATH}:/data
+      - ${CADDY_CONFIG_DIR}:/config
+    environment:
+      - TZ=${TZ}
+    healthcheck:
+      test: ["CMD-SHELL", "echo -e 'GET / HTTP/1.0\\r\\nHost: localhost\\r\\n\\r\\n' | nc 127.0.0.1 80 | grep -q '^HTTP/'"]
+      interval: ${HEALTH_INTERVAL}
+      timeout: ${HEALTH_TIMEOUT}
+      retries: ${HEALTH_RETRIES}
+    logging:
+      driver: ${LOG_DRIVER}
+      options:
+        max-size: ${LOG_SIZE}
+        max-file: ${LOG_FILES}
+
+networks:
+  macvlan_network:
+    external: true

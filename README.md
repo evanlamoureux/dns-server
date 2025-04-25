@@ -26,8 +26,7 @@ A modular, environment-variable-driven infrastructure stack for running self-hos
 ```
 
 Each stack includes:
-- `STACK.yml` — Docker Compose file with variable references  
-- `.env` — Secrets and config values (**not committed**)  
+- `STACK.yml` — Docker Compose file with variable references   
 - `.env.template` — Public template with hints
 
 ---

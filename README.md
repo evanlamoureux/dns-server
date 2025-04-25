@@ -18,6 +18,7 @@ A modular, environment-variable-driven infrastructure stack for running self-hos
 ├── notes/        → Memos, PrivateBin  
 ├── portainer/    → Portainer  
 ├── proxy/        → Caddy reverse proxy  
+├── sync/         → Nebula-Sync (Pi-hole replicator)  
 ├── update/       → Diun update notifier  
 ├── uptime/       → StatusOwl Dockman agent  
 ├── vault/        → Vaultwarden password manager  
@@ -50,18 +51,19 @@ docker compose -f /etc/dns/dns.yml --env-file /etc/dns/.env up -d
 
 ## 📦 Stack Overview
 
-| Stack         | Folder        | Services Included                          |
-|---------------|---------------|--------------------------------------------|
-| **Dashboard** | `dash/`       | Heimdall                                   |
-| **DNS**       | `dns/`        | Pi-hole + Unbound + Exporters              |
-| **Failover**  | `failover/`   | Redundant Pi-hole + Unbound + Exporters    |
-| **Proxy**     | `proxy/`      | Caddy reverse proxy with local TLS         |
+| Stack         | Folder        | Services Included                                  |
+|---------------|---------------|----------------------------------------------------|
+| **Dashboard** | `dash/`       | Heimdall                                           |
+| **DNS**       | `dns/`        | Pi-hole + Unbound + Exporters                      |
+| **Failover**  | `failover/`   | Redundant Pi-hole + Unbound + Exporters            |
+| **Proxy**     | `proxy/`      | Caddy reverse proxy with local TLS                 |
 | **Metrics**   | `metrics/`    | Grafana, Prometheus, Loki, Promtail, Node Exporter |
-| **Notes**     | `notes/`      | Memos, PrivateBin                          |
-| **Vault**     | `vault/`      | Vaultwarden password manager               |
-| **Updates**   | `update/`     | Diun container update notifier             |
-| **Uptime**    | `uptime/`     | StatusOwl Dockman container monitor        |
-| **VPN**       | `vpn/`        | Tailscale mesh VPN                         |
+| **Notes**     | `notes/`      | Memos, PrivateBin                                  |
+| **Vault**     | `vault/`      | Vaultwarden password manager                       |
+| **Updates**   | `update/`     | Diun container update notifier                     |
+| **Uptime**    | `uptime/`     | StatusOwl Dockman container monitor                |
+| **VPN**       | `vpn/`        | Tailscale mesh VPN                                 |
+| **Sync**      | `sync/`       | Nebula-Sync for syncing Pi-hole instances          |
 
 ---
 

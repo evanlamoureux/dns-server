@@ -2,9 +2,9 @@ services:
   nebula-sync:
     image: ${NEBULA_IMAGE}:${NEBULA_TAG}
     container_name: ${NEBULA_NAME}
-    network:
+    networks:
       macvlan_network:
-        ipv4_address: ${NEBULA_IP)
+        ipv4_address: ${NEBULA_IP}
     environment:
       - PRIMARY=${NEBULA_PRIMARY}
       - REPLICAS=${NEBULA_REPLICAS}

@@ -1,0 +1,29 @@
+services:
+  mealie:
+    container_name: ${MEALIE_NAME}
+    image: ${MEALIE_IMAGE}:${MEALIE_TAG}
+    restart: unless-stopped
+    networks:
+      macvlan_network:
+        ipv4_address: ${MEALIE_IP}
+    volumes:
+      - ${MEALIE_DATA_PATH}:/app/data
+    environment:
+      - TZ=${TZ}
+      - BASE_URL=${MEALIE_BASE_URL}
+      - ALLOW_SIGNUP=${MEALIE_ALLOW_SIGNUP}
+    healthcheck:
+      test: ["CMD", "python", "-m", "mealie.scripts.healthcheck"]
+      interval: ${HEALTH_INTERVAL}
+      timeout: ${HEALTH_TIMEOUT}
+      retries: ${HEALTH_RETRIES}
+      start_period: ${HEALTH_START}
+    logging:
+      driver: ${LOG_DRIVER}
+      options:
+        max-size: ${LOG_SIZE}
+        max-file: ${LOG_FILES}
+
+networks:
+  macvlan_network:
+    external: true

@@ -1,0 +1,36 @@
+services:
+  heimdall:
+    image: ${HEIMDALL_IMAGE}:${HEIMDALL_TAG}
+    container_name: ${HEIMDALL_NAME}
+    hostname: ${HOSTNAME}
+    restart: unless-stopped
+    networks:
+      macvlan_network:
+        ipv4_address: ${HEIMDALL_IP}
+    ports:
+      - "${HEIMDALL_HTTP_PORT}:80"
+      - "${HEIMDALL_HTTPS_PORT}:443"
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+    volumes:
+      - ${HEIMDALL_CONFIG_PATH}:/config
+    labels:
+      caddy: ${HEIMDALL_DOMAIN}
+      caddy.reverse_proxy: "{{upstreams 80}}"
+      caddy.tls: ${CADDY_TLS}
+    healthcheck:
+      test: ["CMD", "curl", "-fsSL", "http://localhost"]
+      interval: ${INTERVAL_TIME}
+      timeout: ${TIMEOUT_TIME}
+      retries: ${RETRIES}
+    logging:
+      driver: "${LOGGING_DRIVER}"
+      options:
+        max-size: "${HEIMDALL_LOG_SIZE}"
+        max-file: "${HEIMDALL_LOG_FILES}"
+
+networks:
+  macvlan_network:
+    external: true

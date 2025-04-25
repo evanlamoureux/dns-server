@@ -2,9 +2,15 @@ services:
   nebula-sync:
     image: ${NEBULA_IMAGE}:${NEBULA_TAG}
     container_name: ${NEBULA_NAME}
+    network:
+      macvlan_network:
+        ipv4_address: ${NEBULA_IP)
     environment:
       - PRIMARY=${NEBULA_PRIMARY}
       - REPLICAS=${NEBULA_REPLICAS}
       - FULL_SYNC=${NEBULA_FULL_SYNC}
       - RUN_GRAVITY=${NEBULA_RUN_GRAVITY}
       - CRON=${NEBULA_CRON}
+networks:
+  macvlan_network:
+    external: true

@@ -1,0 +1,33 @@
+services:
+  diun:
+    container_name: ${DIUN_NAME}
+    hostname: ${DIUN_HOSTNAME}
+    image: ${DIUN_IMAGE}:${DIUN_TAG}
+    restart: unless-stopped
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ${DIUN_CONFIG_PATH}:/diun.yml:ro
+      - ${DIUN_DATA_PATH}:/data
+    environment:
+      - TZ=${TZ}
+      - LOG_LEVEL=${DIUN_LOG_LEVEL}
+      - LOG_JSON=${DIUN_LOG_JSON}
+      - DIUN_CONFIG=/diun.yml
+    networks:
+      macvlan_network:
+        ipv4_address: ${DIUN_IP}
+    healthcheck:
+      test: ["CMD", "diun", "--version"]
+      interval: ${HEALTH_INTERVAL}
+      timeout: ${HEALTH_TIMEOUT}
+      retries: ${HEALTH_RETRIES}
+      start_period: ${HEALTH_START}
+    logging:
+      driver: ${LOG_DRIVER}
+      options:
+        max-size: ${LOG_SIZE}
+        max-file: ${LOG_FILES}
+
+networks:
+  macvlan_network:
+    external: true

@@ -1,0 +1,48 @@
+services:
+  memos:
+    image: ${MEMOS_IMAGE}:${MEMOS_TAG}
+    container_name: ${MEMOS_NAME}
+    hostname: ${MEMOS_HOSTNAME}
+    restart: unless-stopped
+    networks:
+      macvlan_network:
+        ipv4_address: ${MEMOS_IP}
+    volumes:
+      - ${MEMOS_DATA_PATH}:/var/opt/memos
+    healthcheck:
+      test: ["CMD-SHELL", "echo -e 'GET /api/ping HTTP/1.0\\r\\nHost: localhost\\r\\n\\r\\n' | nc 127.0.0.1 5230 | grep -q '^HTTP/'"]
+      interval: ${HEALTH_INTERVAL}
+      timeout: ${HEALTH_TIMEOUT}
+      retries: ${HEALTH_RETRIES}
+    logging:
+      driver: ${LOG_DRIVER}
+      options:
+        max-size: ${LOG_SIZE}
+        max-file: ${LOG_FILES}
+
+  privatebin:
+    image: ${PRIVATEBIN_IMAGE}
+    container_name: ${PRIVATEBIN_NAME}
+    hostname: ${PRIVATEBIN_HOSTNAME}
+    restart: unless-stopped
+    pull_policy: always
+    networks:
+      macvlan_network:
+        ipv4_address: ${PRIVATEBIN_IP}
+    volumes:
+      - ${PRIVATEBIN_DATA_PATH}:/srv/data:rw
+      - ${PRIVATEBIN_CONFIG_PATH}:/srv/cfg:ro
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:8080"]
+      interval: ${HEALTH_INTERVAL}
+      timeout: ${HEALTH_TIMEOUT}
+      retries: ${HEALTH_RETRIES}
+    logging:
+      driver: ${LOG_DRIVER}
+      options:
+        max-size: ${LOG_SIZE}
+        max-file: ${LOG_FILES}
+
+networks:
+  macvlan_network:
+    external: true

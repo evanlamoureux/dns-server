@@ -1,0 +1,147 @@
+services:
+  pihole:
+    image: ${PIHOLE_IMAGE}:${PIHOLE_TAG}
+    container_name: ${PIHOLE_NAME}
+    hostname: ${PIHOLE_HOSTNAME}
+    cap_add:
+      - SYS_TIME
+      - NET_ADMIN
+    networks:
+      macvlan_network:
+        ipv4_address: ${PIHOLE_IP}
+    ports:
+      - "${PIHOLE_PORT_DNS_TCP}:53/tcp"
+      - "${PIHOLE_PORT_DNS_UDP}:53/udp"
+      - "${PIHOLE_PORT_HTTP}:80"
+      - "${PIHOLE_PORT_HTTPS}:443"
+    volumes:
+      - ${PIHOLE_CONFIG_PATH}:/etc/pihole
+      - ${PIHOLE_DNSMASQ_PATH}:/etc/dnsmasq.d
+    environment:
+      TZ: ${TZ}
+      WEBPASSWORD_FILE: ${PIHOLE_WEBPASSWORD_FILE}
+      DNSMASQ_LISTENING: ${DNSMASQ_LISTENING}
+      DNSSEC: ${DNSSEC}
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost/admin"]
+      interval: ${HEALTH_INTERVAL}
+      timeout: ${HEALTH_TIMEOUT}
+      retries: ${HEALTH_RETRIES}
+      start_period: ${HEALTH_START}
+    logging:
+      driver: ${LOG_DRIVER}
+      options:
+        max-size: ${LOG_SIZE}
+        max-file: ${LOG_FILES}
+
+  unbound:
+    image: ${UNBOUND_IMAGE}:${UNBOUND_TAG}
+    container_name: ${UNBOUND_NAME}
+    hostname: ${UNBOUND_HOSTNAME}
+    networks:
+      macvlan_network:
+        ipv4_address: ${UNBOUND_IP}
+    ports:
+      - "${UNBOUND_PORT_DNS_TCP}:53/tcp"
+      - "${UNBOUND_PORT_DNS_UDP}:53/udp"
+      - "${UNBOUND_PORT_STATS}:8953"
+    volumes:
+      - ${UNBOUND_CONF_PATH}:/opt/unbound/etc/unbound
+      - ${UNBOUND_KEYS_PATH}:/opt/unbound/etc/unbound/keys
+      - ${UNBOUND_SOCKETS_PATH}:/var/run/unbound
+      - ${UNBOUND_FILE_CONF}:/opt/unbound/etc/unbound/unbound.conf
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "drill", "@127.0.0.1", "google.com"]
+      interval: ${HEALTH_INTERVAL}
+      timeout: ${HEALTH_TIMEOUT}
+      retries: ${HEALTH_RETRIES}
+      start_period: ${HEALTH_START}
+    logging:
+      driver: ${LOG_DRIVER}
+      options:
+        max-size: ${LOG_SIZE}
+        max-file: ${LOG_FILES}
+
+  pihole-exporter:
+    image: ${PIHOLE_EXPORTER_IMAGE}:${PIHOLE_EXPORTER_TAG}
+    container_name: ${PIHOLE_EXPORTER_NAME}
+    hostname: ${PIHOLE_EXPORTER_HOSTNAME}
+    networks:
+      macvlan_network:
+        ipv4_address: ${PIHOLE_EXPORTER_IP}
+    ports:
+      - "${PIHOLE_EXPORTER_PORT}:9617"
+    environment:
+      PIHOLE_HOSTNAME: ${PIHOLE_IP}
+      PIHOLE_PASSWORD: ${PIHOLE_PASSWORD}
+    depends_on:
+      pihole:
+        condition: service_healthy
+    restart: unless-stopped
+    logging:
+      driver: ${LOG_DRIVER}
+      options:
+        max-size: ${LOG_SIZE}
+        max-file: ${LOG_FILES}
+
+  unbound-exporter:
+    image: ${UNBOUND_EXPORTER_IMAGE}:${UNBOUND_EXPORTER_TAG}
+    container_name: ${UNBOUND_EXPORTER_NAME}
+    hostname: ${UNBOUND_EXPORTER_HOSTNAME}
+    user: ${UNBOUND_EXPORTER_USER}
+    networks:
+      macvlan_network:
+        ipv4_address: ${UNBOUND_EXPORTER_IP}
+    volumes:
+      - ${UNBOUND_FILE_CONF}:/opt/unbound/etc/unbound/unbound.conf:ro
+      - ${UNBOUND_SOCKET}:/var/run/unbound/unbound.ctl:ro
+      - ${UNBOUND_CERT_PEM}:/etc/unbound/unbound_server.pem:ro
+      - ${UNBOUND_CERT_KEY}:/etc/unbound/unbound_server.key:ro
+      - ${UNBOUND_CTL_PEM}:/etc/unbound/unbound_control.pem:ro
+      - ${UNBOUND_CTL_KEY}:/etc/unbound/unbound_control.key:ro
+    command:
+      - --unbound.host=unix:///var/run/unbound/unbound.ctl
+      - --web.listen-address=:9167
+      - --web.telemetry-path=/metrics
+    depends_on:
+      unbound:
+        condition: service_healthy
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "http://localhost:9167/metrics"]
+      interval: ${EXPORTER_HEALTH_INTERVAL}
+      timeout: ${HEALTH_TIMEOUT}
+      retries: ${EXPORTER_HEALTH_RETRIES}
+    logging:
+      driver: ${LOG_DRIVER}
+      options:
+        max-size: ${LOG_SIZE}
+        max-file: ${LOG_FILES}
+
+  unbound-watchdog:
+    image: ${WATCHDOG_IMAGE}
+    container_name: ${WATCHDOG_NAME}
+    hostname: ${WATCHDOG_HOSTNAME}
+    pull_policy: always
+    networks:
+      macvlan_network:
+        ipv4_address: ${WATCHDOG_IP}
+    restart: always
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    healthcheck:
+      test: ["CMD-SHELL", "test \"$(pgrep -f watchdog.sh)\" && docker ps > /dev/null"]
+      interval: ${WATCHDOG_HEALTH_INTERVAL}
+      timeout: ${HEALTH_TIMEOUT}
+      retries: ${WATCHDOG_HEALTH_RETRIES}
+    logging:
+      driver: ${LOG_DRIVER}
+      options:
+        max-size: ${LOG_SIZE}
+        max-file: ${LOG_FILES}
+
+networks:
+  macvlan_network:
+    external: true

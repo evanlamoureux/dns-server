@@ -1,0 +1,31 @@
+services:
+  portainer:
+    image: portainer/portainer-ce:alpine
+    container_name: portainer
+    restart: unless-stopped
+    networks:
+      macvlan_network:
+        ipv4_address: 192.168.1.246
+    ports:
+      - "8000:8000"
+      - "9000:9000"
+      - "9443:9443"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /etc/portainer/data:/data
+    environment:
+      - TZ=Australia/Sydney
+    labels:
+      caddy: manage.abjuration.home
+      caddy.reverse_proxy: "{{upstreams 9000}}"
+      caddy.tls: internal
+
+    healthcheck:
+        test: "nc -z -v localhost 9000 || exit 1"
+        interval: 30s
+        timeout: 5s
+        retries: 3
+
+networks:
+  macvlan_network:
+    external: true

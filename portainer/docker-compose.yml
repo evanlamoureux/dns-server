@@ -19,7 +19,7 @@ services:
     labels:
       caddy: ${PORTAINER_DOMAIN}
       caddy.reverse_proxy: "{{upstreams 9000}}"
-      caddy.tls: $(CADDY_TLS)
+      caddy.tls: ${CADDY_TLS}
     healthcheck:
       test: "nc -z -v localhost 9000 || exit 1"
       interval: ${HEALTH_INTERVAL}

@@ -25,7 +25,6 @@ services:
     container_name: ${PRIVATEBIN_NAME}
     hostname: ${PRIVATEBIN_HOSTNAME}
     restart: unless-stopped
-    pull_policy: always
     networks:
       macvlan_network:
         ipv4_address: ${PRIVATEBIN_IP}

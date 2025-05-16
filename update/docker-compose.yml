@@ -16,6 +16,8 @@ services:
     networks:
       macvlan_network:
         ipv4_address: ${DIUN_IP}
+    dns:
+      - 192.168.1.254
     healthcheck:
       test: ["CMD", "diun", "--version"]
       interval: ${HEALTH_INTERVAL}

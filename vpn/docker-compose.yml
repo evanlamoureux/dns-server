@@ -19,7 +19,7 @@ services:
     cap_add:
       - NET_ADMIN
       - SYS_MODULE
-    restart: no
+    restart: always-restart
     healthcheck:
       test: ["CMD", "tailscale", "status"]
       interval: ${HEALTH_INTERVAL}
@@ -30,7 +30,7 @@ services:
       options:
         max-size: ${LOG_SIZE}
         max-file: ${LOG_FILES}
-
+    command: sleep infinitely
 networks:
   macvlan_network:
     external: true

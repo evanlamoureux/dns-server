@@ -30,6 +30,7 @@ services:
       options:
         max-size: ${LOG_SIZE}
         max-file: ${LOG_FILES}
+    command: sleep infinity
 
 networks:
   macvlan_network:

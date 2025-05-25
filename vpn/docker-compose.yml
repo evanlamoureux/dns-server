@@ -20,7 +20,11 @@ services:
       - NET_ADMIN
       - SYS_MODULE
     restart: no
-    
+    healthcheck:
+      test: ["CMD", "tailscale", "status"]
+      interval: ${HEALTH_INTERVAL}
+      timeout: ${HEALTH_TIMEOUT}
+      retries: ${HEALTH_RETRIES}
     logging:
       driver: ${LOG_DRIVER}
       options:

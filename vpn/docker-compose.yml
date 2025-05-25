@@ -31,7 +31,6 @@ services:
         max-size: ${LOG_SIZE}
         max-file: ${LOG_FILES}
 
-
 networks:
   macvlan_network:
     external: true

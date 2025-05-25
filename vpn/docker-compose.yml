@@ -19,7 +19,7 @@ services:
     cap_add:
       - NET_ADMIN
       - SYS_MODULE
-    restart: always-restart
+    restart: no
     healthcheck:
       test: ["CMD", "tailscale", "status"]
       interval: ${HEALTH_INTERVAL}

@@ -21,7 +21,7 @@ services:
         max-file: ${LOG_FILES}
 
   privatebin:
-    image: ${PRIVATEBIN_IMAGE}
+    image: ${PRIVATEBIN_IMAGE}:${PRIVATEBIN_TAG}
     container_name: ${PRIVATEBIN_NAME}
     hostname: ${PRIVATEBIN_HOSTNAME}
     restart: unless-stopped

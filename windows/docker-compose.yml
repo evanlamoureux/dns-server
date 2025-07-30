@@ -21,10 +21,10 @@ services:
       - ${GLUETUN_VOLUME}:${GLUETUN_MOUNT}
     restart: always
     healthcheck:
-      test: ["CMD", "ping", "-c", "1", "${HEALTHCHECK_HOST}"]
-      interval: ${HEALTHCHECK_INTERVAL}
-      timeout: ${HEALTHCHECK_TIMEOUT}
-      retries: ${HEALTHCHECK_RETRIES}
+       test: ["CMD-SHELL", "wget -q --spider https://www.google.com || exit 1"]
+       interval: ${HEALTHCHECK_INTERVAL}
+       timeout: ${HEALTHCHECK_TIMEOUT}
+       retries: ${HEALTHCHECK_RETRIES}
 
   windows:
     image: ${WINDOWS_IMAGE}

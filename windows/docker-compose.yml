@@ -2,29 +2,34 @@ services:
   gluetun:
     image: qmcgaw/gluetun
     container_name: gluetun
-    hostname: gluetun
+    platform: linux/arm64/v8
     cap_add:
       - NET_ADMIN
     devices:
       - /dev/net/tun
     environment:
-      - VPN_SERVICE_PROVIDER=${VPN_PROVIDER}
+      - VPN_SERVICE_PROVIDER=windscribe
+      - VPN_TYPE=openvpn
       - OPENVPN_USER=${WIND_USERNAME}
       - OPENVPN_PASSWORD=${WIND_PASSWORD}
-      - SERVER_COUNTRIES=${WIND_COUNTRY}
-      - TZ=${TZ}
+      - SERVER_REGIONS=${WIND_REGIONS}
+      - TZ=Australia/Sydney
+      - FIREWALL=on
+      - FIREWALL_OUTBOUND_SUBNETS=192.168.1.0/24
+    volumes:
+      - ${GLUETUN_VOLUME}:${GLUETUN_MOUNT}
     ports:
       - ${WINDOWS_WEB_PORT}:${WINDOWS_WEB_PORT}
       - ${RDP_PORT}:${RDP_PORT}/tcp
       - ${RDP_PORT}:${RDP_PORT}/udp
-    volumes:
-      - ${GLUETUN_VOLUME}:${GLUETUN_MOUNT}
-    restart: always
-    
+    restart: unless-stopped
+    healthcheck:
+      disable: true
 
   windows:
     image: ${WINDOWS_IMAGE}
     container_name: windows
+    hostname: windows
     environment:
       - VERSION=${WINDOWS_VERSION}
     devices:
@@ -39,4 +44,4 @@ services:
     network_mode: "service:gluetun"
     depends_on:
       gluetun:
-        condition: service_healthy
+        condition: service_started

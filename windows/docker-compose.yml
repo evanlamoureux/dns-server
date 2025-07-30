@@ -1,0 +1,46 @@
+services:
+  ${GLUETUN_CONTAINER}:
+    image: qmcgaw/gluetun
+    container_name: ${GLUETUN_CONTAINER}
+    cap_add:
+      - NET_ADMIN
+    devices:
+      - /dev/net/tun
+    environment:
+      - VPN_SERVICE_PROVIDER=${VPN_PROVIDER}
+      - OPENVPN_USER=${WIND_USERNAME}
+      - OPENVPN_PASSWORD=${WIND_PASSWORD}
+      - SERVER_COUNTRIES=${WIND_COUNTRY}
+      - TZ=${TZ}
+    ports:
+      - ${WINDOWS_WEB_PORT}:${WINDOWS_WEB_PORT}
+      - ${RDP_PORT}:${RDP_PORT}/tcp
+      - ${RDP_PORT}:${RDP_PORT}/udp
+    volumes:
+      - ${GLUETUN_VOLUME}:${GLUETUN_MOUNT}
+    restart: always
+    healthcheck:
+      test: ["CMD", "ping", "-c", "1", "${HEALTHCHECK_HOST}"]
+      interval: ${HEALTHCHECK_INTERVAL}
+      timeout: ${HEALTHCHECK_TIMEOUT}
+      retries: ${HEALTHCHECK_RETRIES}
+
+  ${WINDOWS_CONTAINER}:
+    image: ${WINDOWS_IMAGE}
+    container_name: ${WINDOWS_CONTAINER}
+    hostname: ${WINDOWS_HOSTNAME}
+    environment:
+      - VERSION=${WINDOWS_VERSION}
+    devices:
+      - ${KVM_DEVICE}
+      - ${TUN_DEVICE}
+    cap_add:
+      - NET_ADMIN
+    volumes:
+      - ${WINDOWS_VOLUME}:${WINDOWS_MOUNT}
+    restart: always
+    stop_grace_period: ${STOP_GRACE_PERIOD}
+    network_mode: "service:${GLUETUN_CONTAINER}"
+    depends_on:
+      ${GLUETUN_CONTAINER}:
+        condition: service_healthy

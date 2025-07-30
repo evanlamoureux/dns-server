@@ -34,10 +34,11 @@ services:
     hostname: ${WINDOWS_HOSTNAME}
     environment:
       - VERSION=${WINDOWS_VERSION}
+      - VM_NET_DEV=lo
     devices:
       - ${KVM_DEVICE}
       - ${TUN_DEVICE}
-      - VM_NET_DEV=lo
+
     cap_add:
       - NET_ADMIN
     volumes:

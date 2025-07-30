@@ -21,7 +21,7 @@ services:
       - ${GLUETUN_VOLUME}:${GLUETUN_MOUNT}
     restart: always
     healthcheck:
-       disable:true
+        disable:true
     
 
   windows:

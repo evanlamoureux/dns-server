@@ -17,15 +17,16 @@ services:
       - TZ=Australia/Sydney
       - FIREWALL=on
       - FIREWALL_OUTBOUND_SUBNETS=192.168.1.0/24
+      - DNS_PORT=${DNS_PORT}   
     volumes:
       - ${GLUETUN_VOLUME}:${GLUETUN_MOUNT}
     ports:
-      - ${WINDOWS_WEB_PORT}:${WINDOWS_WEB_PORT}
-      - ${RDP_PORT}:${RDP_PORT}/tcp
-      - ${RDP_PORT}:${RDP_PORT}/udp
+      - "${DNS_PORT}:${DNS_PORT}/tcp"
+      - "${DNS_PORT}:${DNS_PORT}/udp"
+      - "${WINDOWS_WEB_PORT}:${WINDOWS_WEB_PORT}"
+      - "${RDP_PORT}:${RDP_PORT}/tcp"
+      - "${RDP_PORT}:${RDP_PORT}/udp"
     restart: unless-stopped
-    healthcheck:
-      disable: true
 
   windows:
     image: ${WINDOWS_IMAGE}

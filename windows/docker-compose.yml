@@ -34,7 +34,7 @@ services:
     hostname: ${WINDOWS_HOSTNAME}
     environment:
       - VERSION=${WINDOWS_VERSION}
-      - VM_NET_DEV=lo
+      - VM_NET_DEV=tun0
     devices:
       - ${KVM_DEVICE}
       - ${TUN_DEVICE}

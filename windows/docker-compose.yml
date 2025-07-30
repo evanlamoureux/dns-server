@@ -38,7 +38,6 @@ services:
       - ${KVM_DEVICE}
       - ${TUN_DEVICE}
       - VM_NET_DEV=eth0
-      - VM_NET_DEV=tun0
     cap_add:
       - NET_ADMIN
     volumes:

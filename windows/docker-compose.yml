@@ -1,5 +1,5 @@
 services:
-  ${GLUETUN_CONTAINER}:
+  gluetun:
     image: qmcgaw/gluetun
     container_name: ${GLUETUN_CONTAINER}
     cap_add:
@@ -25,7 +25,7 @@ services:
       timeout: ${HEALTHCHECK_TIMEOUT}
       retries: ${HEALTHCHECK_RETRIES}
 
-  ${WINDOWS_CONTAINER}:
+  windows:
     image: ${WINDOWS_IMAGE}
     container_name: ${WINDOWS_CONTAINER}
     hostname: ${WINDOWS_HOSTNAME}

@@ -37,12 +37,11 @@ services:
     devices:
       - ${KVM_DEVICE}
       - ${TUN_DEVICE}
-      - VM_NET_DEV=eth0
     cap_add:
       - NET_ADMIN
     volumes:
       - ${WINDOWS_VOLUME}:${WINDOWS_MOUNT}
-    restart: always
+    restart: unless-stopped
     stop_grace_period: ${STOP_GRACE_PERIOD}
     network_mode: "service:gluetun"
     depends_on:

@@ -29,7 +29,6 @@ services:
   windows:
     image: ${WINDOWS_IMAGE}
     container_name: windows
-    hostname: ${WINDOWS_HOSTNAME}
     environment:
       - VERSION=${WINDOWS_VERSION}
     devices:

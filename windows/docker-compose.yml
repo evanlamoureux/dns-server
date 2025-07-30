@@ -1,7 +1,8 @@
 services:
   gluetun:
     image: qmcgaw/gluetun
-    container_name: windscribe
+    container_name: gluetun
+    hostname: gluetun
     platform: linux/arm64/v8
     cap_add:
       - NET_ADMIN
@@ -41,6 +42,7 @@ services:
       - ${WINDOWS_VOLUME}:${WINDOWS_MOUNT}
     restart: always
     stop_grace_period: ${STOP_GRACE_PERIOD}
+    network_mode: "service:gluetun"
     depends_on:
       gluetun:
         condition: service_started

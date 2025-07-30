@@ -1,7 +1,8 @@
 services:
   gluetun:
     image: qmcgaw/gluetun
-    container_name: ${GLUETUN_CONTAINER}
+    container_name: gluetun
+hostname: gluetun
     cap_add:
       - NET_ADMIN
     devices:
@@ -27,7 +28,7 @@ services:
 
   windows:
     image: ${WINDOWS_IMAGE}
-    container_name: ${WINDOWS_CONTAINER}
+    container_name: windows
     hostname: ${WINDOWS_HOSTNAME}
     environment:
       - VERSION=${WINDOWS_VERSION}

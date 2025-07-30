@@ -41,7 +41,7 @@ hostname: gluetun
       - ${WINDOWS_VOLUME}:${WINDOWS_MOUNT}
     restart: always
     stop_grace_period: ${STOP_GRACE_PERIOD}
-    network_mode: "service:${GLUETUN_CONTAINER}"
+    network_mode: "service:gluetun"
     depends_on:
       ${GLUETUN_CONTAINER}:
         condition: service_healthy

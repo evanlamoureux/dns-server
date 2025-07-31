@@ -17,7 +17,7 @@ services:
       - TZ=Australia/Sydney
       - FIREWALL=on
       - FIREWALL_OUTBOUND_SUBNETS=192.168.1.0/24
-      - DNS_PORT=${DNS_PORT}   
+      - DNS_PORT=${DNS_PORT}
     volumes:
       - ${GLUETUN_VOLUME}:${GLUETUN_MOUNT}
     ports:
@@ -27,6 +27,11 @@ services:
       - "${RDP_PORT}:${RDP_PORT}/tcp"
       - "${RDP_PORT}:${RDP_PORT}/udp"
     restart: unless-stopped
+    healthcheck:
+      test: curl -sf https://ipinfo.io/ip || exit 1
+      interval: 1m
+      timeout: 10s
+      retries: 3
 
   windows:
     image: ${WINDOWS_IMAGE}
@@ -38,7 +43,6 @@ services:
     devices:
       - ${KVM_DEVICE}
       - ${TUN_DEVICE}
-
     cap_add:
       - NET_ADMIN
     volumes:
@@ -52,6 +56,7 @@ services:
     depends_on:
       gluetun:
         condition: service_healthy
+
 networks:
   macvlan_network:
     external: true

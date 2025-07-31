@@ -46,22 +46,4 @@ services:
       gluetun:
         condition: service_healthy
 
-  windows-bridge:
-    image: alpine
-    container_name: windows-bridge
-    entrypoint: ["/bin/sh", "-c"]
-    command: |
-      apk add --no-cache docker-cli &&
-      until docker network connect --ip 192.168.1.225 macvlan_network windows 2>/dev/null; do
-        echo "⏳ Waiting for windows to be ready..."
-        sleep 1
-      done &&
-      echo "✅ Connected windows to macvlan" &&
-      sleep infinity
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-    restart: on-failure
-
-networks:
-  macvlan_network:
-    external: true
+  

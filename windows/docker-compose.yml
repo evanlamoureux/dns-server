@@ -23,6 +23,9 @@ services:
     ports:
       - "${DNS_PORT}:${DNS_PORT}/tcp"
       - "${DNS_PORT}:${DNS_PORT}/udp"
+      - "${WINDOWS_WEB_PORT}:${WINDOWS_WEB_PORT}"
+      - "${RDP_PORT}:${RDP_PORT}/tcp"
+      - "${RDP_PORT}:${RDP_PORT}/udp"
     restart: unless-stopped
 
   windows:
@@ -45,5 +48,3 @@ services:
     depends_on:
       gluetun:
         condition: service_healthy
-
-  

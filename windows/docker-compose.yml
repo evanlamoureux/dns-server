@@ -24,11 +24,6 @@ services:
       - "${DNS_PORT}:${DNS_PORT}/tcp"
       - "${DNS_PORT}:${DNS_PORT}/udp"
     restart: unless-stopped
-    healthcheck:
-      test: curl -sf https://ipinfo.io/ip || exit 1
-      interval: 1m
-      timeout: 10s
-      retries: 3
 
   windows:
     image: ${WINDOWS_IMAGE}

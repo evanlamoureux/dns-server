@@ -23,9 +23,6 @@ services:
     ports:
       - "${DNS_PORT}:${DNS_PORT}/tcp"
       - "${DNS_PORT}:${DNS_PORT}/udp"
-      - "${WINDOWS_WEB_PORT}:${WINDOWS_WEB_PORT}"
-      - "${RDP_PORT}:${RDP_PORT}/tcp"
-      - "${RDP_PORT}:${RDP_PORT}/udp"
     restart: unless-stopped
     healthcheck:
       test: curl -sf https://ipinfo.io/ip || exit 1
@@ -48,14 +45,27 @@ services:
     volumes:
       - ${WINDOWS_VOLUME}:${WINDOWS_MOUNT}
     restart: unless-stopped
-    networks:
-      macvlan_network:
-        ipv4_address: 192.168.1.225
     stop_grace_period: ${STOP_GRACE_PERIOD}
     network_mode: "service:gluetun"
     depends_on:
       gluetun:
         condition: service_healthy
+
+  windows-bridge:
+    image: alpine
+    container_name: windows-bridge
+    entrypoint: ["/bin/sh", "-c"]
+    command: |
+      apk add --no-cache docker-cli &&
+      until docker network connect --ip 192.168.1.225 macvlan_network windows 2>/dev/null; do
+        echo "⏳ Waiting for windows to be ready..."
+        sleep 1
+      done &&
+      echo "✅ Connected windows to macvlan" &&
+      sleep infinity
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    restart: on-failure
 
 networks:
   macvlan_network:

@@ -44,8 +44,14 @@ services:
     volumes:
       - ${WINDOWS_VOLUME}:${WINDOWS_MOUNT}
     restart: unless-stopped
+    networks:
+      macvlan_network:
+        ipv4_address: 192.168.1.225
     stop_grace_period: ${STOP_GRACE_PERIOD}
     network_mode: "service:gluetun"
     depends_on:
       gluetun:
         condition: service_healthy
+networks:
+  macvlan_network:
+    external: true

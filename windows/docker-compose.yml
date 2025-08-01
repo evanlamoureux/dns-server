@@ -26,7 +26,7 @@ services:
       - "${WINDOWS_WEB_PORT}:${WINDOWS_WEB_PORT}"
       - "${RDP_PORT}:${RDP_PORT}/tcp"
       - "${RDP_PORT}:${RDP_PORT}/udp"
-      - "445:445/tcp"   # SMB port added
+      - "445:445/tcp"
     restart: unless-stopped
 
   windows:

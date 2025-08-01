@@ -26,5 +26,5 @@ services:
       - "${WINDOWS_WEB_PORT}:${WINDOWS_WEB_PORT}"
       - "${RDP_PORT}:${RDP_PORT}/tcp"
       - "${RDP_PORT}:${RDP_PORT}/udp"
-      - "445:445/tcp" # <-- added for SMB
+      - "445:445/tcp"
     restart: unless-stopped

@@ -26,5 +26,26 @@ services:
       - "${WINDOWS_WEB_PORT}:${WINDOWS_WEB_PORT}"
       - "${RDP_PORT}:${RDP_PORT}/tcp"
       - "${RDP_PORT}:${RDP_PORT}/udp"
-      - "445:445/tcp"
+      - "445:445/tcp"   # SMB port added
     restart: unless-stopped
+
+  windows:
+    image: ${WINDOWS_IMAGE}
+    container_name: windows
+    hostname: ${WINDOWS_HOSTNAME}
+    environment:
+      - VERSION=${WINDOWS_VERSION}
+      - VM_NET_DEV=eth0
+    devices:
+      - ${KVM_DEVICE}
+      - ${TUN_DEVICE}
+    cap_add:
+      - NET_ADMIN
+    volumes:
+      - ${WINDOWS_VOLUME}:${WINDOWS_MOUNT}
+    restart: unless-stopped
+    stop_grace_period: ${STOP_GRACE_PERIOD}
+    network_mode: "service:gluetun"
+    depends_on:
+      gluetun:
+        condition: service_healthy

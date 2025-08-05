@@ -18,6 +18,9 @@ services:
       - FIREWALL=on
       - FIREWALL_OUTBOUND_SUBNETS=192.168.1.0/24
       - DNS_PORT=${DNS_PORT}
+      - BLOCK_MALICIOUS=off
+      - BLOCK_SURVEILLANCE=off
+      - BLOCK_ADS=off
     volumes:
       - ${GLUETUN_VOLUME}:${GLUETUN_MOUNT}
     ports:
@@ -28,6 +31,7 @@ services:
       - "${RDP_PORT}:${RDP_PORT}/udp"
       - "445:445/tcp"
     restart: unless-stopped
+    
 
   windows:
     image: ${WINDOWS_IMAGE}

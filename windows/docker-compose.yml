@@ -30,6 +30,7 @@ services:
       - "${RDP_PORT}:${RDP_PORT}/tcp"
       - "${RDP_PORT}:${RDP_PORT}/udp"
       - "445:445/tcp"
+    dns: 192.168.1.254
     restart: unless-stopped
     
 

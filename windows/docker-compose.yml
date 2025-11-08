@@ -10,9 +10,8 @@ services:
       - /dev/net/tun
     environment:
       - VPN_SERVICE_PROVIDER=windscribe
-      - VPN_TYPE=openvpn
-      - OPENVPN_USER=${WIND_USERNAME}
-      - OPENVPN_PASSWORD=${WIND_PASSWORD}
+      - VPN_TYPE=${VPN_TYPE}
+      - WIREGUARD_PRIVATE_KEY=${WIREGUARD_KEY}
       - SERVER_REGIONS=${WIND_REGIONS}
       - TZ=Australia/Sydney
       - FIREWALL=on

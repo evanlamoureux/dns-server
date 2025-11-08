@@ -36,7 +36,6 @@ services:
   windows:
     image: ${WINDOWS_IMAGE}
     container_name: windows
-    hostname: ${WINDOWS_HOSTNAME}
     environment:
       - VERSION=${WINDOWS_VERSION}
       - VM_NET_DEV=eth0
@@ -50,6 +49,6 @@ services:
     restart: unless-stopped
     stop_grace_period: ${STOP_GRACE_PERIOD}
     network_mode: "service:gluetun"
-    depends_on:
-      gluetun:
-        condition: service_healthy
+#    depends_on:
+#      gluetun:
+#        condition: service_healthy

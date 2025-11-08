@@ -10,19 +10,11 @@ services:
       - /dev/net/tun
     environment:
       - VPN_SERVICE_PROVIDER=windscribe
-      - VPN_TYPE=${VPN_TYPE}
-      - SERVER_CITIES=${SERVER_CITIES}
-      - WIREGUARD_PRIVATE_KEY=${WIREGUARD_KEY}
-      - SERVER_REGIONS=${SERVER_REGIONS}
+      - VPN_TYPE=wireguard
+      - WIREGUARD_PRIVATE_KEY=${WIREGUARD_PRIVATE}
       - WIREGUARD_ADDRESSES=${WIREGUARD_ADDRESSES}
-      - WIREGUARD_ENDPOINT_PORT=${VPN_ENDPOINT_PORT}
-      - TZ=Australia/Sydney
-      - FIREWALL=on
-      - FIREWALL_OUTBOUND_SUBNETS=192.168.1.0/24
-      - DNS_PORT=${DNS_PORT}
-      - BLOCK_MALICIOUS=off
-      - BLOCK_SURVEILLANCE=off
-      - BLOCK_ADS=off
+      - WIREGUARD_PRESHARED_KEY=${WIREGUARD_PRESHARED}
+      - SERVER_REGIONS=Australia
     volumes:
       - ${GLUETUN_VOLUME}:${GLUETUN_MOUNT}
     ports:

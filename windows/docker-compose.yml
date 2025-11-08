@@ -12,6 +12,9 @@ services:
       - VPN_SERVICE_PROVIDER=windscribe
       - VPN_TYPE=${VPN_TYPE}
       - WIREGUARD_PRIVATE_KEY=${WIREGUARD_KEY}
+      - WIREGUARD_ADDRESSES 
+      - WIREGUARD_ADDRESSES_SECRETFILE       /run/secrets/wireguard_addresses
+      - WIREGUARD_CONF_SECRETFILE            /run/secrets/wg0.conf
       - SERVER_REGIONS=${WIND_REGIONS}
       - TZ=Australia/Sydney
       - FIREWALL=on
